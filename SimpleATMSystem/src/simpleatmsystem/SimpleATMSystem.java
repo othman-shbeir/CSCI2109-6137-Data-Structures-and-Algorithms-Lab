@@ -3,29 +3,42 @@ package simpleatmsystem;
 import java.util.Scanner;
 
 /**
- * SimpleATMSystem --------------- This class contains the main (menu-driven)
- * program for a simple ATM system.
+ * SimpleATMSystem
+ * ----------------
+ * This class contains the main (menu-driven) program for a simple ATM system.
  *
- * What the program does: 1) Stores up to 100 bank accounts in an array
- * (Account[]). 2) Allows the user to: - Create a new account (Savings or
- * Checking) - Deposit into an account - Withdraw from an account - Show the
- * last N transactions for an account - Show an account summary (basic details)
+ * What the program does:
+ * 1) Stores bank accounts dynamically using a custom ArrayList (MyArrayList<Account>).
+ * 2) Allows the user to:
+ *    - Create a new account (Savings or Checking)
+ *    - Deposit money into an account
+ *    - Withdraw money from an account
+ *    - Show the last N transactions for an account
+ *    - Display an account summary (basic details)
  *
- * Important notes for students: - The program uses ARRAYS only (not ArrayList).
- * - Each operation asks the user to authenticate (Account Number + PIN). - The
- * actual account rules (withdraw rules, deposit rules, fees, interest,
- * transaction history) are handled inside the Account classes.
+ * Important notes for students:
+ * - The program uses a custom ArrayList implementation (MyArrayList),
+ *   NOT a fixed-size array.
+ * - Accounts can grow dynamically without a predefined limit.
+ * - Each operation requires authentication (Account Number + PIN).
+ * - Business rules (withdraw rules, deposit validation, fees, interest,
+ *   transaction history) are handled inside the Account classes.
+ *
+ * This class focuses on:
+ * - Applying ArrayList concepts in a real-world case study
+ * - Separating responsibilities between system logic and account logic
  */
 public class SimpleATMSystem {
 
     /**
      * Entry point of the program.
      *
-     * Steps: - Create a Scanner for reading user input. - Create an array of
-     * Account objects to store accounts. - Show the main menu in an infinite
-     * loop until the user chooses Exit.
+     * Steps:
+     * - Create a Scanner for reading user input.
+     * - Create a dynamic list of Account objects using MyArrayList.
+     * - Continuously display the main menu until the user chooses to exit.
      *
-     * @param args command line arguments (not used here)
+     * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
@@ -33,61 +46,54 @@ public class SimpleATMSystem {
         // Stores the user's menu choice
         int choice = 0;
 
-        // Array to store up to 100 accounts (fixed size)
-        Account[] accounts = new Account[100];
-
-        // Tracks how many accounts are currently stored in the array
-        int count = 0;
+        // Dynamic list to store all bank accounts
+        MyArrayList<Account> accounts = new MyArrayList<>();
 
         System.out.println("Welcome to the ATM System");
 
-        // Infinite loop: keep showing the menu until user exits (choice 0)
+        // Infinite loop: keeps running until the user selects Exit (choice 0)
         while (true) {
             printMenu();
             choice = input.nextInt();
 
             switch (choice) {
                 case 1:
-                    // Create a new account (Savings or Checking)
+                    // Create a new Savings or Checking account
                     Account newAccount = createAccount();
 
-                    // NOTE: This debug line prints the account number for testing.
-                    // In a real system, we usually remove debug prints.
+                    // Debug line to confirm account creation (for learning/testing only)
                     if (newAccount != null) {
                         System.out.println("Debug add: " + newAccount.getAccountNumber());
                     }
 
-                    // If creation was successful, store the new account in the array
+                    // Add the new account to the dynamic list
                     if (newAccount != null) {
-                        // IMPORTANT: In a real program, we should also check:
-                        // if (count >= accounts.length) { ... } to avoid overflow.
-                        accounts[count] = newAccount;
-                        count++;
+                        accounts.add(newAccount);
                     }
                     break;
 
                 case 2:
-                    // Deposit operation
+                    // Deposit money into an account
                     depositToAccount(accounts);
                     break;
 
                 case 3:
-                    // Withdraw operation
+                    // Withdraw money from an account
                     withdrawFromAccount(accounts);
                     break;
 
                 case 4:
-                    // Show last N transactions
+                    // Display the last N transactions
                     showLastNTransactions(accounts);
                     break;
 
                 case 5:
-                    // Print account summary
+                    // Display account summary
                     showAccountSummary(accounts);
                     break;
 
                 case 0:
-                    // Exit the program immediately
+                    // Exit the program
                     System.exit(0);
                     break;
 
@@ -98,13 +104,13 @@ public class SimpleATMSystem {
     }
 
     /**
-     * Prints the main menu for the ATM program. This method only prints text;
-     * it does not read input.
+     * Prints the main menu options for the ATM system.
+     * This method is responsible only for displaying menu text.
      */
     public static void printMenu() {
         System.out.println("============= Main Menu ==============");
         System.out.println("1. Create new Account");
-        System.out.println("2. Deposite");
+        System.out.println("2. Deposit");
         System.out.println("3. Withdraw");
         System.out.println("4. Show the last N Transactions");
         System.out.println("5. Show the account summary");
@@ -113,14 +119,20 @@ public class SimpleATMSystem {
     }
 
     /**
-     * Creates a new account by asking the user for: - Account type (Savings or
-     * Checking) - Account number - Owner name - PIN - Initial balance - Then
-     * type-specific data: - Savings: interest rate - Checking: transaction fee
+     * Creates a new bank account by collecting required information from the user.
      *
-     * If the user enters an invalid account type, the method returns null.
+     * The method asks for:
+     * - Account type (Savings or Checking)
+     * - Account number
+     * - Owner name
+     * - PIN
+     * - Initial balance
      *
-     * @return a new Account object (SavingsAccount or CheckingAccount), or null
-     * if invalid input
+     * Additional data based on account type:
+     * - SavingsAccount: interest rate
+     * - CheckingAccount: transaction fee
+     *
+     * @return a newly created Account object, or null if input is invalid
      */
     public static Account createAccount() {
 
@@ -131,137 +143,94 @@ public class SimpleATMSystem {
         Scanner input = new Scanner(System.in);
         int inputAccountType = input.nextInt();
 
-        // Read account number (String)
         System.out.println("Enter the Account Number:");
-        input.nextLine(); // consume the leftover newline after nextInt()
+        input.nextLine(); // Consume leftover newline
         String accountNumber = input.nextLine();
 
-        // Read owner name
         System.out.println("Enter the Account Owner Name:");
-        String owenrName = input.nextLine();
+        String ownerName = input.nextLine();
 
-        // Read PIN (int)
         System.out.println("Enter the Account PIN:");
         int pin = input.nextInt();
 
-        // Read initial balance (double)
         System.out.println("Enter the Account initial Balance:");
-        double initialBance = input.nextDouble();
+        double initialBalance = input.nextDouble();
 
-        // Create the correct account type based on user choice
         switch (inputAccountType) {
-            case 1: {
-                // Savings account needs an interest rate
+            case 1:
                 System.out.println("Enter the Account interest rate:");
                 double interestRate = input.nextDouble();
-
-                Account savingsAccount = new SavingsAccount(
-                        accountNumber,
-                        owenrName,
-                        pin,
-                        initialBance,
-                        interestRate
+                return new SavingsAccount(
+                        accountNumber, ownerName, pin, initialBalance, interestRate
                 );
 
-                return savingsAccount;
-            }
-            case 2: {
-                // Checking account needs a transaction fee
+            case 2:
                 System.out.println("Enter the Account transaction fee:");
                 double transactionFee = input.nextDouble();
-
-                Account checkingAccount = new CheckingAccount(
-                        accountNumber,
-                        owenrName,
-                        pin,
-                        initialBance,
-                        transactionFee
+                return new CheckingAccount(
+                        accountNumber, ownerName, pin, initialBalance, transactionFee
                 );
 
-                return checkingAccount;
-            }
-            default: {
-                // Invalid account type
+            default:
                 System.out.println("Invalid Input!");
                 return null;
-            }
         }
     }
 
     /**
-     * Authenticates (verifies) an account by: 1) Asking the user for an account
-     * number 2) Searching for that account in the accounts array 3) If found,
-     * asking for the PIN 4) Checking the PIN using account.checkPIN(pin)
+     * Authenticates an account using:
+     * - Account number
+     * - PIN
      *
-     * If authentication succeeds, returns the Account object. Otherwise,
-     * returns null.
+     * The method performs a linear search over the ArrayList of accounts.
      *
-     * @param accounts array of stored accounts
-     * @return the authenticated Account, or null if not found / wrong PIN
+     * @param accounts dynamic list of stored accounts
+     * @return the authenticated Account object, or null if authentication fails
      */
-    public static Account authAccount(Account[] accounts) {
+    public static Account authAccount(MyArrayList<Account> accounts) {
         Scanner input = new Scanner(System.in);
 
         System.out.println("Enter the Account Number");
         String accountNumber = input.nextLine();
 
-        // Linear search through the array (because we are using arrays, not hash maps)
+        // Linear search through the ArrayList
         for (Account account : accounts) {
-
-            // Skip empty (null) positions in the array
-            if (account == null) {
-                continue;
-            }
-
-            // Compare account numbers (trim spaces + ignore case)
             if (account.getAccountNumber().equalsIgnoreCase(accountNumber.trim())) {
-
                 System.out.println("Enter the Account PIN");
                 int inputPIN = input.nextInt();
 
-                // If PIN correct, return the account
                 if (account.checkPIN(inputPIN)) {
                     return account;
                 } else {
-                    // Account number matched but PIN was wrong
                     return null;
                 }
             }
         }
-
-        // No account matched the provided account number
         return null;
     }
 
     /**
      * Deposits money into an authenticated account.
      *
-     * Steps: 1) Authenticate account (account number + PIN) 2) Read deposit
-     * amount 3) Call account.deposite(amount) 4) Handle invalid amount using
-     * IllegalArgumentException
-     *
-     * @param accounts array of stored accounts
+     * @param accounts dynamic list of stored accounts
      */
-    public static void depositToAccount(Account[] accounts) {
+    public static void depositToAccount(MyArrayList<Account> accounts) {
         Scanner input = new Scanner(System.in);
         System.out.println("=============Deposit to Account===============");
 
-        // Authenticate first
         Account account = authAccount(accounts);
         if (account == null) {
             System.out.println("Wrong Account number or PIN!");
             return;
         }
 
-        System.out.println("Enter the deposit amount: ");
+        System.out.println("Enter the deposit amount:");
         double amount = input.nextDouble();
 
         try {
-            // The Account class should validate deposit amount (> 0)
             account.deposite(amount);
             System.out.println("Deposit Successful. | New Balance: " + account.getBalance());
         } catch (IllegalArgumentException ex) {
-            // For example: deposit of negative or zero amount
             System.out.println("Error: " + ex.getMessage());
         }
     }
@@ -269,77 +238,59 @@ public class SimpleATMSystem {
     /**
      * Withdraws money from an authenticated account.
      *
-     * Steps: 1) Authenticate account 2) Read withdraw amount 3) Call
-     * account.withdraw(amount) 4) Handle: - IllegalArgumentException (invalid
-     * amount like <= 0) - InsufficientFundsException (not enough balance)
-     *
-     * @param accounts array of stored accounts
+     * @param accounts dynamic list of stored accounts
      */
-    public static void withdrawFromAccount(Account[] accounts) {
+    public static void withdrawFromAccount(MyArrayList<Account> accounts) {
         Scanner input = new Scanner(System.in);
         System.out.println("=============Withdraw to Account===============");
 
-        // Authenticate first
         Account account = authAccount(accounts);
         if (account == null) {
             System.out.println("Wrong Account number or PIN!");
             return;
         }
 
-        System.out.println("Enter the withdraw amount: ");
+        System.out.println("Enter the withdraw amount:");
         double amount = input.nextDouble();
 
         try {
             account.withdraw(amount);
-            System.out.println("withdraw Successful. | New Balance: " + account.getBalance());
-        } catch (IllegalArgumentException ex) {
-            // For example: withdraw amount <= 0
-            System.out.println("Error: " + ex.getMessage());
-        } catch (InsufficientFundsException ex) {
-            // For example: withdraw amount greater than balance
+            System.out.println("Withdraw Successful. | New Balance: " + account.getBalance());
+        } catch (IllegalArgumentException | InsufficientFundsException ex) {
             System.out.println("Error: " + ex.getMessage());
         }
     }
 
     /**
-     * Shows the most recent N transactions for an authenticated account.
+     * Displays the most recent N transactions of an authenticated account.
      *
-     * Steps: 1) Authenticate account 2) Ask user for N (how many recent
-     * transactions to show) 3) Call account.printLastNTransactions(n)
-     *
-     * @param accounts array of stored accounts
+     * @param accounts dynamic list of stored accounts
      */
-    public static void showLastNTransactions(Account[] accounts) {
+    public static void showLastNTransactions(MyArrayList<Account> accounts) {
         Scanner input = new Scanner(System.in);
 
         System.out.println("=============Show Last N Transactions===============");
 
-        // Authenticate first
         Account account = authAccount(accounts);
         if (account == null) {
             System.out.println("Wrong Account number or PIN!");
             return;
         }
 
-        System.out.println("Enter the number of the most recent transactions to show: ");
+        System.out.println("Enter the number of recent transactions to show:");
         int n = input.nextInt();
 
-        // The Account class should handle cases such as:
-        // - n <= 0
-        // - n > number of stored transactions
         account.printLastNTransactions(n);
     }
 
     /**
-     * Prints a summary of the authenticated account: - Account number - Owner
-     * name - Account type - Current balance
+     * Displays a summary of an authenticated account.
      *
-     * @param accounts array of stored accounts
+     * @param accounts dynamic list of stored accounts
      */
-    public static void showAccountSummary(Account[] accounts) {
+    public static void showAccountSummary(MyArrayList<Account> accounts) {
         System.out.println("=============Show Account Summary===============");
 
-        // Authenticate first
         Account account = authAccount(accounts);
         if (account == null) {
             System.out.println("Wrong Account number or PIN!");
