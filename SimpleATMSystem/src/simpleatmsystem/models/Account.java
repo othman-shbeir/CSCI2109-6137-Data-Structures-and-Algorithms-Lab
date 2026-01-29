@@ -1,40 +1,55 @@
-package simpleatmsystem;
+package simpleatmsystem.models;
+
+import simpleatmsystem.comparators.AmountComparator;
+import simpleatmsystem.exceptions.InsufficientFundsException;
+import simpleatmsystem.exceptions.InsufficientFundsException;
+import simpleatmsystem.lib.BinaryTree;
 
 /**
  * The Account class represents a generic bank account in the ATM system.
- * 
- * This is an abstract class and serves as a base class for specific
- * account types such as SavingsAccount, CurrentAccount, etc.
- * 
- * It provides common functionality such as:
- * - PIN authentication
- * - Deposits
- * - Transaction history tracking
- * - Balance management
+ *
+ * This is an abstract class and serves as a base class for specific account
+ * types such as SavingsAccount, CurrentAccount, etc.
+ *
+ * It provides common functionality such as: - PIN authentication - Deposits -
+ * Transaction history tracking - Balance management
  */
 public abstract class Account {
 
-    /** Unique account number used to identify the account */
+    /**
+     * Unique account number used to identify the account
+     */
     private String accountNumber;
 
-    /** Full name of the account owner */
+    /**
+     * Full name of the account owner
+     */
     private String ownerName;
 
-    /** Personal Identification Number (PIN) used for authentication */
+    /**
+     * Personal Identification Number (PIN) used for authentication
+     */
     int pin;
 
-    /** Current balance of the account (accessible by subclasses) */
+    /**
+     * Current balance of the account (accessible by subclasses)
+     */
     protected double balance;
 
-    /** Stores the history of all transactions performed on the account */
+    /**
+     * Stores the history of all transactions performed on the account
+     */
     private TransactionsHistory history;
+
+    private BinaryTree<TransactionsEntry> transactionsBinaryTree = new BinaryTree<>();
+    private AmountComparator amoutComparator = new AmountComparator();
 
     /**
      * Constructs a new Account with essential account details.
      *
-     * @param accountNumber  the unique account number
-     * @param ownerName      the name of the account owner
-     * @param pin            the PIN used for authentication
+     * @param accountNumber the unique account number
+     * @param ownerName the name of the account owner
+     * @param pin the PIN used for authentication
      * @param initialBalance the starting balance of the account
      * @throws IllegalArgumentException if the initial balance is not positive
      */
@@ -73,24 +88,28 @@ public abstract class Account {
      * @throws IllegalArgumentException if the amount is zero or negative
      */
     public void deposite(double amount) {
-        // Validate deposit amount
         if (amount <= 0) {
             throw new IllegalArgumentException("Deposit amount must be positive!");
         }
 
-        // Update account balance
         this.balance = this.balance + amount;
 
-        // Record the transaction in the history
-        this.history.add("Deposited: " + amount
-                + " | New Balance: " + this.balance);
+        String msg = "Deposited: " + amount + " | New Balance: " + this.balance;
+
+        // history (LinkedList-based)
+        this.history.add(msg);
+
+        // add to transactions tree
+        this.transactionsBinaryTree.add(new TransactionsEntry(amount, msg),
+                this.amoutComparator);
+
     }
 
     /**
      * Withdraws money from the account.
-     * 
-     * This method is abstract because withdrawal rules
-     * may differ between account types.
+     *
+     * This method is abstract because withdrawal rules may differ between
+     * account types.
      *
      * @param amount the amount to withdraw
      * @throws InsufficientFundsException if the balance is insufficient
@@ -99,14 +118,20 @@ public abstract class Account {
 
     /**
      * Records a custom transaction message in the history.
-     * 
-     * This method is protected so it can only be accessed
-     * by subclasses of Account.
+     *
+     * This method is protected so it can only be accessed by subclasses of
+     * Account.
      *
      * @param message the transaction description to record
      */
-    protected void record(String message) {
+    // ===================== Recording =====================
+    // For messages with amount: record into BOTH history + tree
+    protected void record(double amount, String message) {
         this.history.add(message);
+
+        // add to transactions tree
+        this.transactionsBinaryTree.add(new TransactionsEntry(amount, message),
+                this.amoutComparator);
     }
 
     /**
@@ -119,8 +144,8 @@ public abstract class Account {
     }
 
     /**
-     * Returns the run-time type of the account
-     * (e.g., SavingsAccount, CurrentAccount, etc.).
+     * Returns the run-time type of the account (e.g., SavingsAccount,
+     * CurrentAccount, etc.).
      *
      * @return the account type as a string
      */
@@ -154,4 +179,15 @@ public abstract class Account {
     public double getBalance() {
         return balance;
     }
+
+    public BinaryTree<TransactionsEntry> getTransactionsBinaryTree() {
+        return transactionsBinaryTree;
+    }
+
+    public AmountComparator getAmoutComparator() {
+        return amoutComparator;
+    }
+    
+    
+
 }

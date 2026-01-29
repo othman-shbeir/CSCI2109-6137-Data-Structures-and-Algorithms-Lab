@@ -1,4 +1,6 @@
-package simpleatmsystem;
+package simpleatmsystem.models;
+
+import simpleatmsystem.exceptions.InsufficientFundsException;
 
 /**
  * The CheckingAccount class represents a checking (current) bank account.
@@ -70,8 +72,8 @@ public class CheckingAccount extends Account {
         // Deduct the total amount from the balance
         balance -= totalAmount;
 
-        // Record the transaction in the account history
-        record("Checking Account Withdrawal: " + amount
+        // record into history + tree using record(amount, msg)
+        record(totalAmount, "Checking Account Withdrawal: " + amount
                 + " | Fee: " + this.transactionFee
                 + " | New Balance: " + balance);
     }

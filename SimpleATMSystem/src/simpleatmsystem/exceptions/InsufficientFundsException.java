@@ -1,4 +1,4 @@
-package simpleatmsystem;
+package simpleatmsystem.exceptions;
 
 /**
  * Custom exception thrown when a withdrawal operation

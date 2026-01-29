@@ -1,42 +1,41 @@
 package simpleatmsystem;
 
+import simpleatmsystem.exceptions.InsufficientFundsException;
+import simpleatmsystem.models.SavingsAccount;
+import simpleatmsystem.models.Account;
+import simpleatmsystem.models.CheckingAccount;
+import simpleatmsystem.lib.MyArrayList;
 import java.util.Scanner;
+import simpleatmsystem.models.TransactionsEntry;
 
 /**
- * SimpleATMSystem
- * ----------------
- * This class contains the main (menu-driven) program for a simple ATM system.
+ * SimpleATMSystem ---------------- This class contains the main (menu-driven)
+ * program for a simple ATM system.
  *
- * What the program does:
- * 1) Stores bank accounts dynamically using a custom ArrayList (MyArrayList<Account>).
- * 2) Allows the user to:
- *    - Create a new account (Savings or Checking)
- *    - Deposit money into an account
- *    - Withdraw money from an account
- *    - Show the last N transactions for an account
- *    - Display an account summary (basic details)
+ * What the program does: 1) Stores bank accounts dynamically using a custom
+ * ArrayList (MyArrayList<Account>). 2) Allows the user to: - Create a new
+ * account (Savings or Checking) - Deposit money into an account - Withdraw
+ * money from an account - Show the last N transactions for an account - Display
+ * an account summary (basic details)
  *
- * Important notes for students:
- * - The program uses a custom ArrayList implementation (MyArrayList),
- *   NOT a fixed-size array.
- * - Accounts can grow dynamically without a predefined limit.
- * - Each operation requires authentication (Account Number + PIN).
- * - Business rules (withdraw rules, deposit validation, fees, interest,
- *   transaction history) are handled inside the Account classes.
+ * Important notes for students: - The program uses a custom ArrayList
+ * implementation (MyArrayList), NOT a fixed-size array. - Accounts can grow
+ * dynamically without a predefined limit. - Each operation requires
+ * authentication (Account Number + PIN). - Business rules (withdraw rules,
+ * deposit validation, fees, interest, transaction history) are handled inside
+ * the Account classes.
  *
- * This class focuses on:
- * - Applying ArrayList concepts in a real-world case study
- * - Separating responsibilities between system logic and account logic
+ * This class focuses on: - Applying ArrayList concepts in a real-world case
+ * study - Separating responsibilities between system logic and account logic
  */
 public class SimpleATMSystem {
 
     /**
      * Entry point of the program.
      *
-     * Steps:
-     * - Create a Scanner for reading user input.
-     * - Create a dynamic list of Account objects using MyArrayList.
-     * - Continuously display the main menu until the user chooses to exit.
+     * Steps: - Create a Scanner for reading user input. - Create a dynamic list
+     * of Account objects using MyArrayList. - Continuously display the main
+     * menu until the user chooses to exit.
      *
      * @param args command-line arguments (not used)
      */
@@ -61,11 +60,11 @@ public class SimpleATMSystem {
                     // Create a new Savings or Checking account
                     Account newAccount = createAccount();
 
-                    // Debug line to confirm account creation (for learning/testing only)
-                    if (newAccount != null) {
-                        System.out.println("Debug add: " + newAccount.getAccountNumber());
-                    }
-
+//                    // Debug line to confirm account creation (for learning/testing only)
+//                    if (newAccount != null) {
+//                        System.out.println("Debug add: " +
+//                                newAccount.getAccountNumber());
+//                    }
                     // Add the new account to the dynamic list
                     if (newAccount != null) {
                         accounts.add(newAccount);
@@ -92,6 +91,10 @@ public class SimpleATMSystem {
                     showAccountSummary(accounts);
                     break;
 
+                case 6:
+                    // Transactions Explorer
+                    transactionsExplorer(accounts);
+                    break;
                 case 0:
                     // Exit the program
                     System.exit(0);
@@ -104,8 +107,8 @@ public class SimpleATMSystem {
     }
 
     /**
-     * Prints the main menu options for the ATM system.
-     * This method is responsible only for displaying menu text.
+     * Prints the main menu options for the ATM system. This method is
+     * responsible only for displaying menu text.
      */
     public static void printMenu() {
         System.out.println("============= Main Menu ==============");
@@ -114,23 +117,20 @@ public class SimpleATMSystem {
         System.out.println("3. Withdraw");
         System.out.println("4. Show the last N Transactions");
         System.out.println("5. Show the account summary");
+        System.out.println("6. Show the Transactions Explorer (Tree)");
         System.out.println("0. Exit");
         System.out.println("=====================================");
     }
 
     /**
-     * Creates a new bank account by collecting required information from the user.
+     * Creates a new bank account by collecting required information from the
+     * user.
      *
-     * The method asks for:
-     * - Account type (Savings or Checking)
-     * - Account number
-     * - Owner name
-     * - PIN
-     * - Initial balance
+     * The method asks for: - Account type (Savings or Checking) - Account
+     * number - Owner name - PIN - Initial balance
      *
-     * Additional data based on account type:
-     * - SavingsAccount: interest rate
-     * - CheckingAccount: transaction fee
+     * Additional data based on account type: - SavingsAccount: interest rate -
+     * CheckingAccount: transaction fee
      *
      * @return a newly created Account object, or null if input is invalid
      */
@@ -178,9 +178,7 @@ public class SimpleATMSystem {
     }
 
     /**
-     * Authenticates an account using:
-     * - Account number
-     * - PIN
+     * Authenticates an account using: - Account number - PIN
      *
      * The method performs a linear search over the ArrayList of accounts.
      *
@@ -302,4 +300,59 @@ public class SimpleATMSystem {
         System.out.println("Account Type: " + account.getAccountType());
         System.out.println("Account Current Balance: " + account.getBalance());
     }
+
+    public static void transactionsExplorer(MyArrayList<Account> accounts) {
+        System.out.println("============= Transactions Explorer ===============");
+
+        Account account = authAccount(accounts);
+        if (account == null) {
+            System.out.println("Wrong Account number or PIN!");
+            return;
+        }
+
+        System.out.println("========Transactions Explorer Menu============");
+        // 1- Show all of the authenticated Account transactions order by amount
+        System.out.println("1- Show all of the authenticated Account transactions order by amount");
+        // 2- Show all transaction of the authenticated account in range [min, max] amount.
+        System.out.println("2- Show all transaction of the authenticated account in range [min, max] amount.");
+        // 3- Show transactions tree hieght.
+        System.out.println("3- Show transactions tree hieght.");
+        // 4- Show breadth-first traversal (level order)
+        System.out.println("4- Show breadth-first traversal (level order)");
+        // 0- Back
+        System.out.println("0- Back");
+
+        System.out.println("Enter your choice:");
+        Scanner input = new Scanner(System.in);
+        int choice = input.nextInt();
+
+        switch (choice) {
+            case 1:
+                System.out.println("=======Sorted Transactions by Amount========");
+                account.getTransactionsBinaryTree().inOrder();
+                break;
+            case 2:
+                System.out.println("Enter the min amount: ");
+                double minAmount = input.nextDouble();
+                TransactionsEntry min = new TransactionsEntry(minAmount, "");
+
+                System.out.println("Enter the max amount: ");
+                double maxAmount = input.nextDouble();
+                TransactionsEntry max = new TransactionsEntry(maxAmount, "");
+
+                System.out.println("======Transactions in Range [" + min + ", " + max + "]=======");
+
+                MyArrayList<TransactionsEntry> result = account
+                        .getTransactionsBinaryTree()
+                        .rangeSearch(min, max, account.getAmoutComparator());
+
+                for (TransactionsEntry te : result) {
+                    System.out.println(te.getMsg());
+                }
+                break;
+
+        }
+
+    }
+
 }

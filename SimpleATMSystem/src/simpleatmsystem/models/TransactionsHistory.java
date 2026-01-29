@@ -1,4 +1,6 @@
-package simpleatmsystem;
+package simpleatmsystem.models;
+
+import simpleatmsystem.lib.LinkedList;
 
 /**
  * The TransactionsHistory class implements a fixed-size circular buffer for

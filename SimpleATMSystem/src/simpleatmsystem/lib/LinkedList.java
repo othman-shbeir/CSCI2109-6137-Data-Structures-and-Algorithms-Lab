@@ -1,4 +1,4 @@
-package simpleatmsystem;
+package simpleatmsystem.lib;
 
 
 import java.util.Iterator;
